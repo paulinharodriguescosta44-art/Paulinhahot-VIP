@@ -2,43 +2,59 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { VideoCard } from './components/VideoCard';
-import { AdminUpload } from './components/AdminUpload';
 import { VipCodeModal } from './components/VipCodeModal';
 import { MOCK_VIDEOS } from './constants';
 import { Video, UserState } from './types';
-import { Lock, Plus, X, Settings } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
 
-// Simple Modal Video Player Component
-const VideoPlayer: React.FC<{ video: Video; onClose: () => void }> = ({ video, onClose }) => (
-  <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
-    <div className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-      <div className="flex justify-between items-center p-4 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
-        <h3 className="text-white font-serif text-lg truncate pr-8">{video.title}</h3>
-        <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors">
-          <X size={24} />
-        </button>
-      </div>
-      <div className="aspect-video bg-neutral-900 flex items-center justify-center">
-        {video.previewUrl ? (
-          <video 
-            src={video.previewUrl} 
-            controls 
-            autoPlay 
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <div className="text-center p-8">
-             <p className="text-gray-400 mb-2">Este é um vídeo de demonstração sem arquivo anexado.</p>
-             <p className="text-sm text-gray-600">No modo admin, faça upload de um arquivo .mp4 para vê-lo aqui.</p>
-          </div>
-        )}
+// Player Atualizado para suportar Embeds (Drive/Vimeo)
+const VideoPlayer: React.FC<{ video: Video; onClose: () => void }> = ({ video, onClose }) => {
+  // Verifica se é um link que precisa de iframe (Vimeo, Drive, Youtube, etc)
+  const isEmbed = video.previewUrl?.includes('drive.google.com') || 
+                  video.previewUrl?.includes('vimeo.com') || 
+                  video.previewUrl?.includes('youtube.com');
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
+      <div className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+        <div className="flex justify-between items-center p-4 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+          <h3 className="text-white font-serif text-lg truncate pr-8 pointer-events-auto">{video.title}</h3>
+          <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors pointer-events-auto">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="aspect-video bg-neutral-900 flex items-center justify-center relative">
+          {video.previewUrl ? (
+            isEmbed ? (
+              <iframe 
+                src={video.previewUrl} 
+                className="w-full h-full" 
+                frameBorder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowFullScreen
+                title={video.title}
+              ></iframe>
+            ) : (
+              <video 
+                src={video.previewUrl} 
+                controls 
+                autoPlay 
+                className="w-full h-full object-contain"
+              />
+            )
+          ) : (
+            <div className="text-center p-8">
+               <p className="text-gray-400">Vídeo indisponível no momento.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const App: React.FC = () => {
-  // Persistence Loading for User State
+  // Carrega estado do usuário (VIP, favoritos, etc)
   const loadUserState = (): UserState => {
     try {
       const saved = localStorage.getItem('paulinha_state');
@@ -53,78 +69,28 @@ const App: React.FC = () => {
     }
   };
 
-  // Persistence Loading for Videos
-  const loadVideos = (): Video[] => {
-    try {
-      const saved = localStorage.getItem('paulinha_videos_catalog');
-      return saved ? JSON.parse(saved) : MOCK_VIDEOS;
-    } catch (e) {
-      return MOCK_VIDEOS;
-    }
-  };
-
-  // Persistence Loading for Hero Image
-  const loadHeroImage = (): string => {
-    try {
-      const saved = localStorage.getItem('paulinha_hero_image');
-      return saved || "https://picsum.photos/id/1025/1920/1080";
-    } catch (e) {
-      return "https://picsum.photos/id/1025/1920/1080";
-    }
-  }
-
   const [userState, setUserState] = useState<UserState>(loadUserState);
-  const [videos, setVideos] = useState<Video[]>(loadVideos);
-  const [heroImage, setHeroImage] = useState<string>(loadHeroImage);
+  // Vídeos agora vêm direto do código (constants.ts)
+  const [videos] = useState<Video[]>(MOCK_VIDEOS);
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
-  
-  // Admin & Interaction States
-  const [isAdminMode, setIsAdminMode] = useState(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
   const [playingVideo, setPlayingVideo] = useState<Video | null>(null);
 
-  // Save User State
+  // Salva estado do usuário ao alterar
   useEffect(() => {
     localStorage.setItem('paulinha_state', JSON.stringify(userState));
   }, [userState]);
 
-  // Save Video Catalog
-  useEffect(() => {
-    try {
-      localStorage.setItem('paulinha_videos_catalog', JSON.stringify(videos));
-    } catch (e) {
-      console.error("Storage full", e);
-    }
-  }, [videos]);
-
-  // Save Hero Image
-  useEffect(() => {
-    try {
-      localStorage.setItem('paulinha_hero_image', heroImage);
-    } catch (e) {
-      console.error("Storage full (Image)", e);
-    }
-  }, [heroImage]);
-
-  // Interactions
   const handleVideoClick = (video: Video) => {
-    // 1. Se for Admin, libera tudo para preview
-    if (isAdminMode) {
-      setPlayingVideo(video);
-      return;
-    }
-
     const isUnlocked = userState.unlockedVideos.includes(video.id);
     const isGlobalVip = userState.isVipUnlocked;
 
-    // 2. Se o vídeo não é exclusivo, já foi comprado, OU o usuário é VIP global -> Toca o vídeo
+    // Se o vídeo é grátis OU já foi liberado OU o usuário tem a senha VIP
     if (!video.isExclusive || isUnlocked || isGlobalVip) {
        setPlayingVideo(video); 
     } else {
-      // 3. Conteúdo VIP Bloqueado -> Redireciona para pagamento
+      // Bloqueado
       const confirmPurchase = window.confirm(`🔒 CONTEÚDO VIP\n\nEste conteúdo é exclusivo da Paulinha.\nDeseja liberar o acesso completo agora?`);
-      
       if (confirmPurchase) {
         window.open("https://go.tribopay.com.br/zp79c09xnw", "_blank");
       }
@@ -136,25 +102,6 @@ const App: React.FC = () => {
     setIsVipModalOpen(false);
     alert("🔥 SENHA CORRETA!\n\nVocê agora tem acesso TOTAL e ILIMITADO a todos os vídeos. Aproveite!");
   };
-
-  // --- ADMIN FUNCTIONS ---
-
-  const handleAddVideo = (newVideo: Video) => {
-    setVideos(prev => [newVideo, ...prev]);
-    setIsUploadModalOpen(false);
-  };
-
-  const handleDeleteVideo = (id: string) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja EXCLUIR este vídeo permanentemente?");
-    if (confirmDelete) {
-      setVideos(prev => {
-        const updated = prev.filter(v => v.id !== id);
-        return updated;
-      });
-    }
-  };
-
-  // -----------------------
 
   const categories = ['Todos', 'Premium', 'Gratuitos'];
 
@@ -169,15 +116,13 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-neutral-950 font-sans text-gray-100 selection:bg-brand-600 selection:text-white pb-20 relative">
       
       <Navbar 
-        isAdminMode={isAdminMode} 
         onOpenVipModal={() => setIsVipModalOpen(true)}
       />
 
       <main>
+        {/* Usando o link de Thumbnail sz=w1920 que é mais confiável para embeds do que o link de export=view */}
         <Hero 
-          isAdminMode={isAdminMode}
-          heroImage={heroImage}
-          onUpdateImage={setHeroImage}
+          heroImage="https://drive.google.com/thumbnail?id=1rDVrqJeTlYGmnaeDLXg_FHaObUEv5oOZ&sz=w1920" 
         />
 
         {/* Filters */}
@@ -198,31 +143,11 @@ const App: React.FC = () => {
                 </button>
               ))}
             </div>
-            
-            {/* Admin Add Button in Toolbar */}
-            {isAdminMode && (
-              <button 
-                onClick={() => setIsUploadModalOpen(true)}
-                className="hidden md:flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-full font-bold shadow-lg shadow-brand-600/30 transition-all animate-pulse"
-              >
-                <Plus size={18} />
-                ADICIONAR VÍDEO
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Admin Banner */}
-        {isAdminMode && (
-          <div className="bg-red-900/20 border-b border-red-900/50 py-2 text-center animate-fade-in-down">
-            <p className="text-red-400 text-sm font-mono flex items-center justify-center gap-2">
-               <Settings size={14} /> MODO ADMIN ATIVADO
-            </p>
-          </div>
-        )}
-
-        {/* VIP Active Banner (Client Mode) */}
-        {userState.isVipUnlocked && !isAdminMode && (
+        {/* VIP Active Banner */}
+        {userState.isVipUnlocked && (
           <div className="bg-green-900/20 border-b border-green-900/50 py-2 text-center animate-fade-in-down">
             <p className="text-green-400 text-sm font-bold flex items-center justify-center gap-2">
                <Lock size={14} className="text-green-400" /> ACESSO VIP ATIVO
@@ -246,8 +171,6 @@ const App: React.FC = () => {
                 video={video}
                 isUnlocked={userState.unlockedVideos.includes(video.id) || userState.isVipUnlocked}
                 onClick={handleVideoClick}
-                isAdminMode={isAdminMode}
-                onDelete={handleDeleteVideo}
               />
             ))}
           </div>
@@ -255,42 +178,31 @@ const App: React.FC = () => {
           {filteredVideos.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-gray-500 border border-dashed border-white/10 rounded-xl bg-white/5">
               <p className="text-xl mb-2 font-serif">O catálogo está vazio.</p>
-              {isAdminMode ? (
-                <button 
-                  onClick={() => setIsUploadModalOpen(true)}
-                  className="mt-4 px-6 py-2 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition-colors"
-                >
-                  Adicionar Primeiro Vídeo
-                </button>
-              ) : (
-                <p className="text-sm">Aguarde novos lançamentos.</p>
-              )}
+              <p className="text-sm">Edite o arquivo constants.ts para adicionar vídeos.</p>
             </div>
           )}
         </div>
 
         {/* Value Prop */}
-        {!isAdminMode && (
-          <div className="bg-brand-900/30 border-y border-brand-900/50 py-16 mt-8">
-            <div className="max-w-4xl mx-auto px-4 text-center">
-              <Lock className="mx-auto text-brand-500 mb-4" size={40} />
-              <h2 className="text-3xl font-serif text-white mb-4">Total Privacidade e Segurança</h2>
-              <p className="text-gray-400 mb-8">
-                Suas compras são processadas com criptografia de ponta a ponta. 
-                No extrato bancário, aparecerá apenas como "PAY-DIGITAL-SVS".
-              </p>
-              <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale">
-                <span className="text-xl font-bold tracking-widest text-white">VISA</span>
-                <span className="text-xl font-bold tracking-widest text-white">MASTERCARD</span>
-                <span className="text-xl font-bold tracking-widest text-white">PIX</span>
-              </div>
+        <div className="bg-brand-900/30 border-y border-brand-900/50 py-16 mt-8">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <Lock className="mx-auto text-brand-500 mb-4" size={40} />
+            <h2 className="text-3xl font-serif text-white mb-4">Total Privacidade e Segurança</h2>
+            <p className="text-gray-400 mb-8">
+              Suas compras são processadas com criptografia de ponta a ponta. 
+              No extrato bancário, aparecerá apenas como "PAY-DIGITAL-SVS".
+            </p>
+            <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale">
+              <span className="text-xl font-bold tracking-widest text-white">VISA</span>
+              <span className="text-xl font-bold tracking-widest text-white">MASTERCARD</span>
+              <span className="text-xl font-bold tracking-widest text-white">PIX</span>
             </div>
           </div>
-        )}
+        </div>
 
       </main>
 
-      {/* Footer with SECRET ADMIN BUTTON */}
+      {/* Footer */}
       <footer className="bg-black py-12 border-t border-white/10 relative">
         <div className="max-w-7xl mx-auto px-4 text-center relative">
           <p className="text-2xl font-serif italic font-bold text-brand-600 mb-4">Paulinha Hot</p>
@@ -302,40 +214,8 @@ const App: React.FC = () => {
           <p className="text-xs text-gray-700">
             © 2024 Paulinha Hot. Todos os direitos reservados. 18+ Apenas.
           </p>
-          
-          {/* BOTÃO SECRETO DE ADMIN */}
-          {/* Localizado no canto inferior direito, quase invisível. */}
-          <button 
-            onClick={() => {
-              const newState = !isAdminMode;
-              setIsAdminMode(newState);
-              if(newState) alert("🔑 Modo Admin: ATIVADO");
-            }}
-            className="absolute -bottom-8 right-0 p-4 opacity-5 hover:opacity-50 transition-opacity text-white"
-            title="Acesso Restrito"
-          >
-            <Settings size={16} />
-          </button>
         </div>
       </footer>
-
-      {/* Admin Floating Action Button (Mobile) */}
-      {isAdminMode && (
-        <button 
-          onClick={() => setIsUploadModalOpen(true)}
-          className="fixed bottom-6 right-6 md:hidden z-50 bg-brand-600 hover:bg-brand-500 text-white p-4 rounded-full shadow-lg shadow-brand-600/40 transition-transform hover:scale-110"
-        >
-          <Plus size={28} />
-        </button>
-      )}
-
-      {/* Admin Modal */}
-      {isUploadModalOpen && (
-        <AdminUpload 
-          onClose={() => setIsUploadModalOpen(false)}
-          onAddVideo={handleAddVideo}
-        />
-      )}
 
       {/* Vip Code Modal */}
       {isVipModalOpen && (

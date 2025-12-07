@@ -1,21 +1,17 @@
 import React from 'react';
-import { Play, Lock, Trash2, Unlock } from 'lucide-react';
+import { Play, Lock, Unlock } from 'lucide-react';
 import { Video } from '../types';
 
 interface VideoCardProps {
   video: Video;
   isUnlocked: boolean;
   onClick: (video: Video) => void;
-  isAdminMode: boolean;
-  onDelete: (id: string) => void;
 }
 
 export const VideoCard: React.FC<VideoCardProps> = ({ 
   video, 
   isUnlocked, 
-  onClick,
-  isAdminMode,
-  onDelete
+  onClick
 }) => {
   // Logic: 
   // Free video -> Always Unlocked (Show Play)
@@ -23,12 +19,12 @@ export const VideoCard: React.FC<VideoCardProps> = ({
   const showLock = video.isExclusive && !isUnlocked;
 
   return (
-    <div className={`group relative bg-neutral-900 rounded-xl overflow-hidden border transition-all duration-300 ${isAdminMode ? 'border-red-900/50 hover:border-red-500' : 'border-white/5 hover:border-brand-600/50'}`}>
+    <div 
+      className="group relative bg-neutral-900 rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer border-white/5 hover:border-brand-600/50"
+      onClick={() => onClick(video)}
+    >
       {/* Thumbnail Container */}
-      <div 
-        className="relative aspect-[4/3] cursor-pointer overflow-hidden"
-        onClick={() => onClick(video)}
-      >
+      <div className="relative aspect-[4/3] overflow-hidden">
         <img 
           src={video.thumbnailUrl} 
           alt={video.title} 
@@ -51,22 +47,8 @@ export const VideoCard: React.FC<VideoCardProps> = ({
           )}
         </div>
 
-        {/* ADMIN DELETE BUTTON */}
-        {isAdminMode && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Stop click from playing video
-              onDelete(video.id);
-            }}
-            className="absolute top-2 right-2 z-20 bg-red-600 hover:bg-red-500 text-white p-2 rounded-lg shadow-lg transform transition-transform hover:scale-110"
-            title="Excluir Vídeo"
-          >
-            <Trash2 size={18} />
-          </button>
-        )}
-
         {/* Center Icon: Lock or Play */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className={`text-white rounded-full p-4 backdrop-blur-sm transform scale-90 group-hover:scale-100 transition-transform shadow-xl ${showLock ? 'bg-neutral-800/90' : 'bg-brand-600/90'}`}>
             {showLock ? (
               <Lock size={24} />
@@ -84,10 +66,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
       {/* Info */}
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 
-            className="text-lg font-medium text-white group-hover:text-brand-500 transition-colors line-clamp-1 cursor-pointer"
-            onClick={() => onClick(video)}
-          >
+          <h3 className="text-lg font-medium text-white group-hover:text-brand-500 transition-colors line-clamp-1">
             {video.title}
           </h3>
         </div>
@@ -97,9 +76,8 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         </p>
 
         <div className="flex items-center justify-between mt-auto">
-          <div className="text-xs text-gray-500">
-            {video.views.toLocaleString()} views
-          </div>
+          {/* Spacer */}
+          <div></div> 
           
           {!showLock && (
             <span className="text-green-400 font-bold text-sm flex items-center gap-1">

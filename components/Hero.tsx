@@ -1,57 +1,25 @@
-import React, { useRef } from 'react';
-import { Gift, Camera } from 'lucide-react';
+import React, { useState } from 'react';
+import { Gift } from 'lucide-react';
 
 interface HeroProps {
-  isAdminMode: boolean;
   heroImage: string;
-  onUpdateImage: (base64: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ isAdminMode, heroImage, onUpdateImage }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onUpdateImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+export const Hero: React.FC<HeroProps> = ({ heroImage }) => {
+  const [imgSrc, setImgSrc] = useState(heroImage);
 
   return (
     <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden flex items-center justify-center group">
       {/* Background Image with Parallax-like fix */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={heroImage} 
+          src={imgSrc} 
+          onError={() => setImgSrc("https://picsum.photos/id/1025/1920/1080")} // Fallback para evitar tela preta
           alt="Premium Background" 
           className="w-full h-full object-cover object-center filter brightness-50 transition-all duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/40 to-transparent"></div>
       </div>
-
-      {/* Admin: Edit Button (Moved to bottom-right to avoid Navbar overlap) */}
-      {isAdminMode && (
-        <div className="absolute bottom-6 right-6 z-30 animate-fade-in">
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl backdrop-blur-md border border-white/20 transition-all shadow-lg hover:scale-105 group-hover:bg-white/20"
-          >
-            <Camera size={20} />
-            <span className="text-sm font-bold shadow-black drop-shadow-md">Alterar Capa</span>
-          </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*" 
-            onChange={handleFileChange}
-          />
-        </div>
-      )}
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
