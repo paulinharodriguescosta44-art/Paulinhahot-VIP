@@ -13,7 +13,17 @@ const App: React.FC = () => {
   const loadUserState = (): UserState => {
     try {
       const saved = localStorage.getItem('paulinha_state');
-      return saved ? JSON.parse(saved) : { 
+      if (saved) {
+        const parsedState = JSON.parse(saved);
+        // ATUALIZAÇÃO: Forçamos isVipUnlocked para 'false' ao carregar.
+        // Isso impede que o VIP permaneça aberto automaticamente ao atualizar a página.
+        // O usuário precisará digitar a senha novamente a cada nova sessão.
+        return { 
+          ...parsedState, 
+          isVipUnlocked: false 
+        };
+      }
+      return { 
         isAgeVerified: true, 
         unlockedVideos: [], 
         favorites: [],

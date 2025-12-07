@@ -20,18 +20,20 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
   if (finalUrl.includes('vimeo.com')) {
     if (!finalUrl.includes('?')) {
       finalUrl += '?autoplay=1&title=0&byline=0&portrait=0&badge=0';
+    } else if (!finalUrl.includes('autoplay=1')) {
+      finalUrl += '&autoplay=1';
     }
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-in fade-in duration-300">
       
-      {/* Container Principal */}
-      <div className="relative w-full max-w-6xl bg-neutral-900/50 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col animate-in zoom-in-95 duration-300">
+      {/* Container Principal Fullscreen (Ocupa 100% da tela) */}
+      <div className="relative w-full h-full bg-black flex flex-col">
         
-        {/* Header do Player */}
-        <div className="flex justify-between items-center p-4 bg-gradient-to-b from-black/90 to-black/0 absolute top-0 left-0 right-0 z-20 pointer-events-none">
-          <div className="pointer-events-auto">
+        {/* Header Flutuante (Aparece sobre o vídeo com gradiente) */}
+        <div className="flex justify-between items-center p-4 bg-gradient-to-b from-black/90 via-black/50 to-transparent absolute top-0 left-0 right-0 z-20">
+          <div>
             <h3 className="text-white font-serif text-lg font-bold drop-shadow-md flex items-center gap-2">
               <Play size={16} className="text-brand-500 fill-brand-500" />
               {video.title}
@@ -39,18 +41,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
           </div>
           <button 
             onClick={onClose} 
-            className="bg-black/40 hover:bg-brand-600 text-white rounded-full p-2 transition-all backdrop-blur-md pointer-events-auto border border-white/10 hover:border-brand-500"
+            className="bg-black/40 hover:bg-brand-600 text-white rounded-full p-2 transition-all backdrop-blur-md border border-white/10 hover:border-brand-500"
           >
             <X size={24} />
           </button>
         </div>
 
-        {/* Área do Vídeo */}
-        <div className="aspect-video bg-black relative flex items-center justify-center w-full">
+        {/* Área do Vídeo (Flex Grow para ocupar todo o espaço) */}
+        <div className="flex-1 w-full h-full bg-black relative flex items-center justify-center">
           
           {/* Loading State */}
           {isLoading && isEmbed && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-500 z-0">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-500 z-0 bg-neutral-900">
               <Loader2 size={48} className="animate-spin mb-4" />
               <p className="text-gray-400 text-sm animate-pulse">Carregando conteúdo premium...</p>
             </div>
@@ -60,7 +62,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
             isEmbed ? (
               <iframe 
                 src={finalUrl} 
-                className="w-full h-full relative z-10" 
+                className="w-full h-full absolute inset-0 z-10" 
                 frameBorder="0" 
                 allow="autoplay; fullscreen; picture-in-picture" 
                 allowFullScreen
@@ -76,27 +78,23 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
               />
             )
           ) : (
-            <div className="text-center p-8 z-10">
-               <p className="text-gray-400">Vídeo indisponível no momento.</p>
+            <div className="text-center p-8 z-10 text-gray-400">
+               <p>Vídeo indisponível no momento.</p>
             </div>
           )}
         </div>
 
-        {/* Footer / Controles Extras */}
-        <div className="bg-neutral-900 border-t border-white/5 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-           <div className="text-sm text-gray-400 hidden sm:block">
-             <span className="text-brand-500 font-bold">Dica:</span> Use fones de ouvido para melhor experiência 🎧
-           </div>
-           
-           {/* Botão de Abrir Externamente (Útil para mobile/Drive) */}
+        {/* Footer Minimalista (Sobreposto na parte inferior) */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 flex justify-end pointer-events-none">
+           {/* Botão de Abrir Externamente - Interativo */}
            <a 
              href={finalUrl} 
              target="_blank" 
              rel="noreferrer"
-             className="flex items-center gap-2 text-xs font-medium text-gray-500 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10"
+             className="pointer-events-auto flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10"
            >
              <ExternalLink size={14} />
-             Abrir player externo (caso não carregue)
+             Abrir externo
            </a>
         </div>
       </div>

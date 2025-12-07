@@ -27,7 +27,7 @@ export const MOCK_VIDEOS: Video[] = [
     duration: '00:15',
     tags: ['Gratuitos', 'Prévias'],
     isExclusive: false, 
-    views: getRandomViews()
+    views: 23894
   },
   {
     id: 'vid_premium_05',
@@ -42,11 +42,23 @@ export const MOCK_VIDEOS: Video[] = [
     views: getRandomViews()
   },
   {
+    id: 'vid_premium_01',
+    title: 'Dei a buceta de quatro para meu marido',
+    description: '',
+    thumbnailUrl: 'https://i.postimg.cc/BQxMTFNp/foto-1-(2).jpg',
+    previewUrl: 'https://player.vimeo.com/video/1144202822',
+    price: 29.90,
+    duration: '00:50',
+    tags: ['Premium', 'Casal'],
+    isExclusive: true, 
+    views: getRandomViews()
+  },
+  {
     id: 'vid_premium_04',
     title: 'Meu amante me comeu escondido!!!',
     description: '',
     thumbnailUrl: 'https://i.postimg.cc/zXmxH7wj/foto-4.jpg',
-    previewUrl: 'https://player.vimeo.com/video/1144203449',
+    previewUrl: 'https://vimeo.com/1144210481?share=copy&fl=sv&fe=ci',
     price: 29.90,
     duration: '00:54',
     tags: ['Premium', 'Amador'],
@@ -74,18 +86,6 @@ export const MOCK_VIDEOS: Video[] = [
     price: 29.90,
     duration: '01:17',
     tags: ['Premium', 'Hardcore'],
-    isExclusive: true, 
-    views: getRandomViews()
-  },
-  {
-    id: 'vid_premium_01',
-    title: 'Dei a buceta de quatro para meu marido',
-    description: '',
-    thumbnailUrl: 'https://i.postimg.cc/BQxMTFNp/foto-1-(2).jpg',
-    previewUrl: 'https://player.vimeo.com/video/1144202822',
-    price: 29.90,
-    duration: '00:50',
-    tags: ['Premium', 'Casal'],
     isExclusive: true, 
     views: getRandomViews()
   }
