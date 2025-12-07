@@ -2,56 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { VideoCard } from './components/VideoCard';
+import { VideoPlayer } from './components/VideoPlayer'; // Importando o novo player
 import { VipCodeModal } from './components/VipCodeModal';
 import { MOCK_VIDEOS } from './constants';
 import { Video, UserState } from './types';
-import { Lock, X } from 'lucide-react';
-
-// Player Atualizado para suportar Embeds (Drive/Vimeo)
-const VideoPlayer: React.FC<{ video: Video; onClose: () => void }> = ({ video, onClose }) => {
-  // Verifica se é um link que precisa de iframe (Vimeo, Drive, Youtube, etc)
-  const isEmbed = video.previewUrl?.includes('drive.google.com') || 
-                  video.previewUrl?.includes('vimeo.com') || 
-                  video.previewUrl?.includes('youtube.com');
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in">
-      <div className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-        <div className="flex justify-between items-center p-4 absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
-          <h3 className="text-white font-serif text-lg truncate pr-8 pointer-events-auto">{video.title}</h3>
-          <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors pointer-events-auto">
-            <X size={24} />
-          </button>
-        </div>
-        <div className="aspect-video bg-neutral-900 flex items-center justify-center relative">
-          {video.previewUrl ? (
-            isEmbed ? (
-              <iframe 
-                src={video.previewUrl} 
-                className="w-full h-full" 
-                frameBorder="0" 
-                allow="autoplay; fullscreen; picture-in-picture" 
-                allowFullScreen
-                title={video.title}
-              ></iframe>
-            ) : (
-              <video 
-                src={video.previewUrl} 
-                controls 
-                autoPlay 
-                className="w-full h-full object-contain"
-              />
-            )
-          ) : (
-            <div className="text-center p-8">
-               <p className="text-gray-400">Vídeo indisponível no momento.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+import { Lock } from 'lucide-react';
 
 const App: React.FC = () => {
   // Carrega estado do usuário (VIP, favoritos, etc)
