@@ -75,9 +75,9 @@ const App: React.FC = () => {
       />
 
       <main>
-        {/* Usando o link de Thumbnail sz=w1920 que é mais confiável para embeds do que o link de export=view */}
+        {/* Banner Principal com a nova foto solicitada */}
         <Hero 
-          heroImage="https://drive.google.com/thumbnail?id=1rDVrqJeTlYGmnaeDLXg_FHaObUEv5oOZ&sz=w1920" 
+          heroImage="https://i.postimg.cc/KvYdQJk6/5W5w-ARBx.jpg" 
         />
 
         {/* Filters */}
