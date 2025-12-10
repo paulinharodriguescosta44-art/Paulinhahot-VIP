@@ -8,13 +8,24 @@ const getRandomViews = () => {
   return Math.floor(Math.random() * (20000 - 15000 + 1)) + 15000;
 };
 
-// --- CONFIGURAÇÃO DE IMAGENS ---
-// O Google Drive não serve bem para imagens de site (dá erro 403/tela preta).
-// RECOMENDAÇÃO:
-// 1. Entre em https://postimages.org/
-// 2. Envie sua foto.
-// 3. Copie o "Link Direto" (Direct Link).
-// 4. Cole o link nas 'thumbnailUrl' abaixo.
+// --- GUIA PARA ADICIONAR VÍDEOS ---
+// 1. Copie o bloco de código abaixo (o que está entre { e },).
+// 2. Cole no final da lista 'MOCK_VIDEOS', antes do último colchete ].
+// 3. Substitua os links de 'previewUrl' (Vídeo) e 'thumbnailUrl' (Foto).
+/*
+  {
+    id: 'novo_id_unico_aqui',
+    title: 'Título do Vídeo',
+    description: 'Descrição curta',
+    thumbnailUrl: 'https://link-da-imagem.jpg',
+    previewUrl: 'https://link-do-video-vimeo-ou-youtube',
+    price: 29.90,
+    duration: '05:00',
+    tags: ['Premium', 'Categoria'],
+    isExclusive: true, // Mude para false se for grátis
+    views: 15000
+  },
+*/
 
 export const MOCK_VIDEOS: Video[] = [
   {
@@ -22,7 +33,7 @@ export const MOCK_VIDEOS: Video[] = [
     title: '🔥PRÉVIAS🔥', 
     description: '',
     thumbnailUrl: 'https://i.postimg.cc/zBXj5Prf/foto-previa-1.jpg', 
-    previewUrl: 'https://player.vimeo.com/video/1144201363',
+    previewUrl: 'https://player.vimeo.com/video/1143728981',
     price: 0,
     duration: '00:15',
     tags: ['Gratuitos', 'Prévias'],
@@ -46,7 +57,8 @@ export const MOCK_VIDEOS: Video[] = [
     title: 'Dei a buceta de quatro para meu marido',
     description: '',
     thumbnailUrl: 'https://i.postimg.cc/BQxMTFNp/foto-1-(2).jpg',
-    previewUrl: 'https://player.vimeo.com/video/1144202822',
+    // Link atualizado para o novo vídeo do Drive (formato preview)
+    previewUrl: 'https://drive.google.com/file/d/1qJl_Z2-QslKoTLuQWV8U9NQtN4gZh99F/preview',
     price: 29.90,
     duration: '00:50',
     tags: ['Premium', 'Casal'],
@@ -58,7 +70,7 @@ export const MOCK_VIDEOS: Video[] = [
     title: 'Meu amante me comeu escondido!!!',
     description: '',
     thumbnailUrl: 'https://i.postimg.cc/zXmxH7wj/foto-4.jpg',
-    previewUrl: 'https://vimeo.com/1144210481?share=copy&fl=sv&fe=ci',
+    previewUrl: 'https://drive.google.com/file/d/1Hhd0AIq87CNkCVBmW8LWJucGhw9U0u89/preview',
     price: 29.90,
     duration: '00:54',
     tags: ['Premium', 'Amador'],
@@ -88,5 +100,7 @@ export const MOCK_VIDEOS: Video[] = [
     tags: ['Premium', 'Hardcore'],
     isExclusive: true, 
     views: getRandomViews()
-  }
+  },
+  // --- COLE SEUS NOVOS VÍDEOS ABAIXO DESTA LINHA ---
+  
 ];

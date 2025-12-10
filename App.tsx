@@ -46,6 +46,13 @@ const App: React.FC = () => {
     localStorage.setItem('paulinha_state', JSON.stringify(userState));
   }, [userState]);
 
+  // Log de estatísticas para o dono do site
+  useEffect(() => {
+    const clicks = localStorage.getItem('vip_click_count') || '0';
+    console.log(`%c📈 ESTATÍSTICAS DO SITE`, 'color: #ef4444; font-size: 16px; font-weight: bold;');
+    console.log(`%cTotal de cliques no botão VIP (neste dispositivo): ${clicks}`, 'color: white; background: #333; padding: 4px; border-radius: 4px;');
+  }, []);
+
   const handleVideoClick = (video: Video) => {
     const isUnlocked = userState.unlockedVideos.includes(video.id);
     const isGlobalVip = userState.isVipUnlocked;
@@ -57,6 +64,11 @@ const App: React.FC = () => {
       // Bloqueado
       const confirmPurchase = window.confirm(`🔒 CONTEÚDO VIP\n\nEste conteúdo é exclusivo da Paulinha.\nDeseja liberar o acesso completo agora?`);
       if (confirmPurchase) {
+        // Rastrear clique vindo do popup de vídeo bloqueado
+        const currentClicks = parseInt(localStorage.getItem('vip_click_count') || '0');
+        localStorage.setItem('vip_click_count', (currentClicks + 1).toString());
+        console.log(`📊 Clique via Popup de Vídeo! Total: ${currentClicks + 1}`);
+        
         window.open("https://go.tribopay.com.br/zp79c09xnw", "_blank");
       }
     }

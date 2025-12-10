@@ -50,9 +50,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
         {/* Área do Vídeo (Flex Grow para ocupar todo o espaço) */}
         <div className="flex-1 w-full h-full bg-black relative flex items-center justify-center">
           
-          {/* Loading State */}
+          {/* Loading State - Z-Index 20 para garantir que apareça sobre o iframe enquanto carrega */}
           {isLoading && isEmbed && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-500 z-0 bg-neutral-900">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-500 z-20 bg-neutral-900 pointer-events-none">
               <Loader2 size={48} className="animate-spin mb-4" />
               <p className="text-gray-400 text-sm animate-pulse">Carregando conteúdo premium...</p>
             </div>
@@ -64,8 +64,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
                 src={finalUrl} 
                 className="w-full h-full absolute inset-0 z-10" 
                 frameBorder="0" 
-                allow="autoplay; fullscreen; picture-in-picture" 
+                // Permissões completas para compatibilidade máxima com Google Drive
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
                 allowFullScreen
+                // Sandbox vital para scripts do Drive funcionarem em alguns navegadores
+                sandbox="allow-same-origin allow-scripts allow-popups allow-presentation allow-forms"
+                referrerPolicy="no-referrer" 
                 title={video.title}
                 onLoad={() => setIsLoading(false)}
               ></iframe>
@@ -94,7 +98,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onClose }) => {
              className="pointer-events-auto flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10"
            >
              <ExternalLink size={14} />
-             Abrir externo
+             Abrir externo (Caso não carregue)
            </a>
         </div>
       </div>

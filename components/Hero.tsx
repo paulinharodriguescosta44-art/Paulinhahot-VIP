@@ -18,6 +18,19 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 export const Hero: React.FC<HeroProps> = ({ heroImage }) => {
+  
+  const handleVipClick = () => {
+    // Rastreamento de cliques
+    const currentClicks = parseInt(localStorage.getItem('vip_click_count') || '0');
+    const newCount = currentClicks + 1;
+    localStorage.setItem('vip_click_count', newCount.toString());
+    
+    console.log(`📊 Botão VIP clicado! Total acumulado neste dispositivo: ${newCount}`);
+    
+    // Redirecionamento
+    window.open("https://go.tribopay.com.br/zp79c09xnw", "_blank");
+  };
+
   return (
     <div className="relative h-[80vh] min-h-[600px] w-full overflow-hidden flex items-center justify-center group bg-neutral-900">
       {/* Background Image */}
@@ -46,7 +59,7 @@ export const Hero: React.FC<HeroProps> = ({ heroImage }) => {
         {/* Botão Principal VIP */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 mb-8">
           <button 
-            onClick={() => window.open("https://go.tribopay.com.br/zp79c09xnw", "_blank")}
+            onClick={handleVipClick}
             className="group flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-brand-600 to-red-600 hover:from-brand-500 hover:to-red-500 text-white rounded-full font-bold text-xl shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all transform hover:scale-105 hover:shadow-[0_0_50px_rgba(220,38,38,0.8)] border border-brand-500/50"
           >
             <Gift size={28} className="animate-bounce" />
